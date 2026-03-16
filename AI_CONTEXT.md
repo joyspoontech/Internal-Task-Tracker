@@ -24,6 +24,16 @@
 - **Location**: `/src/lib/supabase`
 - **Purpose**: Server, Client, and Middleware tools for authentication.
 
+### NewTaskModal
+- **Location**: `src/components/NewTaskModal.tsx`
+- **Purpose**: High-fidelity modal for creating tasks with custom priority selector and icon-based form fields.
+- **Notes**: Uses Lucide icons and premium design tokens.
+
+### TaskDetailModal
+- **Location**: `src/components/TaskDetailModal.tsx`
+- **Purpose**: Redesigned task inspection modal with threaded comments and status controls.
+- **Notes**: High-density information layout with smooth transitions.
+
 ## Configuration
 - **Environment Variables**: See `.env.example`
 - **API Endpoints**: TBD

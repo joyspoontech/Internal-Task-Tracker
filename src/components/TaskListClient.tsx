@@ -11,6 +11,9 @@ type Task = {
     priority: string
     status: string
     due_date: string | null
+    rejection_reason: string | null
+    assignee_id: string
+    creator_id: string
     assignee: { full_name: string } | null
     creator: { full_name: string } | null
 }

@@ -35,7 +35,7 @@ export async function createTask(formData: FormData) {
             assignee_id,
             creator_id: user.id,
             org_id: profile.org_id,
-            status: 'Not Started'
+            status: 'Pending Acceptance'
         }])
         .select('id')
         .single()
@@ -114,6 +114,67 @@ export async function updateTaskStatus(taskId: string, newStatus: string) {
                     sender: changer ? { id: changer.id, full_name: changer.full_name } : undefined,
                 })
             }
+        }
+    }
+
+    revalidatePath('/dashboard', 'layout')
+    return { success: true }
+}
+
+// ── Respond to Task (Accept/Reject) ──────────────────────────
+export async function respondToTask(taskId: string, accept: boolean, reason?: string) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const newStatus = accept ? 'Not Started' : 'Rejected'
+    const updateData: any = { 
+        status: newStatus, 
+        updated_at: new Date().toISOString() 
+    }
+    
+    if (!accept && reason) {
+        updateData.rejection_reason = reason
+    }
+
+    const { error } = await supabase
+        .from('tasks')
+        .update(updateData)
+        .eq('id', taskId)
+
+    if (error) {
+        console.error('Error responding to task:', error)
+        return { error: error.message }
+    }
+
+    // Notify the creator about the response
+    const { data: task } = await supabase
+        .from('tasks')
+        .select('id, title, creator_id')
+        .eq('id', taskId)
+        .single()
+
+    if (task) {
+        const { data: creator } = await supabase
+            .from('users')
+            .select('id, full_name, email, whatsapp_no')
+            .eq('id', task.creator_id)
+            .single()
+
+        const { data: responder } = await supabase
+            .from('users')
+            .select('id, full_name')
+            .eq('id', user.id)
+            .single()
+
+        if (creator) {
+            await sendNotification({
+                type: accept ? 'task_accepted' : 'task_rejected',
+                task: { ...task, rejection_reason: reason },
+                recipient: creator,
+                sender: responder ? { id: responder.id, full_name: responder.full_name } : undefined,
+            })
         }
     }
 

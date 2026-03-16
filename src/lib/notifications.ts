@@ -7,7 +7,7 @@
  * Set N8N_WEBHOOK_URL in your .env.local file.
  */
 
-type NotificationType = 'task_created' | 'task_blocked' | 'task_completed' | 'task_reminder' | 'task_overdue'
+type NotificationType = 'task_created' | 'task_blocked' | 'task_completed' | 'task_reminder' | 'task_overdue' | 'task_accepted' | 'task_rejected'
 
 interface NotificationPayload {
     type: NotificationType
@@ -18,6 +18,7 @@ interface NotificationPayload {
         priority?: string
         status?: string
         due_date?: string | null
+        rejection_reason?: string | null
     }
     recipient: {
         id: string

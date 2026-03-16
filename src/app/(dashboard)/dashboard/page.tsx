@@ -10,7 +10,7 @@ async function fetchTasksCreatedBy(userId: string) {
     const supabase = await createClient()
     const { data } = await supabase
         .from('tasks')
-        .select(`id, title, description, priority, status, due_date, assignee:assignee_id(full_name), creator:creator_id(full_name)`)
+        .select(`id, title, description, priority, status, due_date, rejection_reason, assignee_id, creator_id, assignee:assignee_id(full_name), creator:creator_id(full_name)`)
         .eq('creator_id', userId)
         .order('created_at', { ascending: false })
     return data || []
@@ -20,7 +20,7 @@ async function fetchTasksAssignedTo(userId: string) {
     const supabase = await createClient()
     const { data } = await supabase
         .from('tasks')
-        .select(`id, title, description, priority, status, due_date, assignee:assignee_id(full_name), creator:creator_id(full_name)`)
+        .select(`id, title, description, priority, status, due_date, rejection_reason, assignee_id, creator_id, assignee:assignee_id(full_name), creator:creator_id(full_name)`)
         .eq('assignee_id', userId)
         .order('due_date', { ascending: true })
     return data || []

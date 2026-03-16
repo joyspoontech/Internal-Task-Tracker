@@ -70,7 +70,7 @@ export default async function DashboardLayout({
                 </div>
             </nav>
 
-            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full animate-fadeIn">
+            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
                 {children}
             </main>
 
