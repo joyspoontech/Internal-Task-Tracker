@@ -53,11 +53,12 @@ export default async function DashboardPage() {
 
     const role = profile.role
 
-    // ── DATA PREPARATION (Unified for all roles) ────────────────
-    const isEmployee = role === 'Employee'
-    const tasksGiven = isEmployee 
-        ? await fetchTasksCreatedBy(user.id) 
-        : await fetchOrgTasks(profile.org_id)
+    // ── DATA PREPARATION (Role-scoped visibility) ──────────────
+    const showOrgOverview = role === 'Founder' || role === 'Admin'
+    const tasksGiven = showOrgOverview 
+        ? await fetchOrgTasks(profile.org_id)
+        : await fetchTasksCreatedBy(user.id)
+    
     const tasksAssigned = await fetchTasksAssignedTo(user.id)
 
     // Subordinates: Managers/Admins/Founders see the org, Employees only see themselves
@@ -95,14 +96,14 @@ export default async function DashboardPage() {
                 <div>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-[var(--primary)]">
-                            {isEmployee ? 'My Logged Tasks' : 'Organization Overview'}
+                            {showOrgOverview ? 'Organization Overview' : 'Tasks Given'}
                         </h2>
                         <CreateTaskButton subordinates={subordinates} />
                     </div>
                     <TaskListClient
                         tasks={tasksGiven as any}
                         isAssignee={false}
-                        emptyMessage={isEmployee ? "No tasks created yet. Use the '+ New Task' button to add your own tasks." : "No tasks in the organization yet."}
+                        emptyMessage={showOrgOverview ? "No tasks in the organization yet." : "No tasks created yet. Use the '+ New Task' button to add your own tasks."}
                     />
                 </div>
 

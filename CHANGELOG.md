@@ -16,6 +16,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.2.0] - 2026-03-20
+
+### Added
+- **Forgot Password**: Complete flow with email reset and secure password update.
+- **Individual Profile Settings**: Users can now manage their own name and WhatsApp details.
+- **Team Management (Founder)**: Direct editing of name, email, and WhatsApp for all members.
+- **Automatic Reminders**: Task-based reminder scheduling (24h, 1h, and deadline).
+- **Cron Engine**: Automated reminder logic with duplicate prevention.
+- **Role-based Privacy**: Restricted Organization Overview to Founders and Admins only.
+
+### Changed
+- Refactored `createTask` to automatically populate reminder schedules.
+- Enhanced Dashboard Layout with Profile navigation.
+- Broadened `updateUserProfile` action to support full member editing.
+
+---
+
 ## [1.0.0] - 2026-03-15
 
 ### Added
