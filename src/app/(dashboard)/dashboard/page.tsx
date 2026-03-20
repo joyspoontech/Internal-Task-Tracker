@@ -37,6 +37,24 @@ async function fetchTasksAssignedTo(userId: string) {
     return (data || []) as any[]
 }
 
+async function fetchDeptTasks(orgId: string, department: string) {
+    const supabase = await createClient()
+    // We need to find tasks where EITHER creator OR assignee is in the department
+    // Since department is on the user profile, we use a join-like filter
+    const { data } = await supabase
+        .from('tasks')
+        .select(`
+            id, title, description, priority, status, due_date, rejection_reason, assignee_id, creator_id,
+            assignee:assignee_id(full_name, department),
+            creator:creator_id(full_name, department)
+        `)
+        .eq('org_id', orgId)
+        .or(`assignee.department.eq."${department}",creator.department.eq."${department}"`)
+        .order('created_at', { ascending: false })
+    
+    return (data || []) as any[]
+}
+
 // ── Page Component ───────────────────────────────────────────
 export default async function DashboardPage() {
     const supabase = await createClient()
@@ -56,6 +74,8 @@ export default async function DashboardPage() {
 
     // ── DATA PREPARATION (Role-scoped visibility & History splitting) ─
     const showOrgOverview = role === 'Founder' || role === 'Admin'
+    const isManager = role === 'Manager'
+
     const rawTasksGiven = showOrgOverview 
         ? await fetchOrgTasks(profile.org_id)
         : await fetchTasksCreatedBy(user.id)
@@ -69,11 +89,26 @@ export default async function DashboardPage() {
     const activeTasksGiven = rawTasksGiven.filter(isActive)
     const activeTasksAssigned = rawTasksAssigned.filter(isActive)
     
-    // Combine history for a unified view, removal of duplicates (if a task is assigned to me AND created by me)
-    const allHistory = [...rawTasksGiven, ...rawTasksAssigned]
-        .filter(isHistory)
-        .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
-        .sort((a, b) => new Date(b.due_date || 0).getTime() - new Date(a.due_date || 0).getTime())
+    // 📂 HISTORY FILTERING LOGIC
+    let historyTasks: any[] = []
+
+    if (showOrgOverview) {
+        // Founder/Admin: All tasks in the org
+        historyTasks = rawTasksGiven.filter(isHistory)
+    } else if (isManager && profile.department) {
+        // Manager: All tasks in their department
+        const deptTasks = await fetchDeptTasks(profile.org_id, profile.department)
+        historyTasks = deptTasks.filter(isHistory)
+    } else {
+        // Employee: Only their own given and assigned tasks
+        historyTasks = [...rawTasksGiven, ...rawTasksAssigned]
+            .filter(isHistory)
+            .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+    }
+
+    historyTasks.sort((a, b) => new Date(b.due_date || b.created_at || 0).getTime() - new Date(a.due_date || a.created_at || 0).getTime())
+
+    const allHistory = historyTasks // Renaming for clarity in the JSX below
 
     // Subordinates: Managers/Admins/Founders see the org, Employees only see themselves
     let subordinates: any[] = []

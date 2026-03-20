@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file.
 - **Automatic Reminders**: Task-based reminder scheduling (24h, 1h, and deadline).
 - **Cron Engine**: Automated reminder logic with duplicate prevention.
 - **Role-based Privacy**: Restricted Organization Overview to Founders and Admins only.
-- **Task History**: Separated completed/rejected tasks into a dedicated history section.
+- **Task History**: Separated completed/rejected tasks into a dedicated history section with role-based visibility (Employees see personal, Managers see department, Founders see organization).
 - **CSV Export**: Added ability to download task lists for reporting and analysis.
 
 ### Changed
