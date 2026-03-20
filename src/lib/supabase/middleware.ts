@@ -31,18 +31,31 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect dashboard routes
-    // Redirect unauthenticated users to /login
-    // Except for public routes: /, /login, /signup, /auth
-    if (
-        !user &&
-        request.nextUrl.pathname !== '/' &&
-        !request.nextUrl.pathname.startsWith('/login') &&
-        !request.nextUrl.pathname.startsWith('/signup') &&
-        !request.nextUrl.pathname.startsWith('/auth')
-    ) {
+    const isPublicRoute = 
+        request.nextUrl.pathname === '/' ||
+        request.nextUrl.pathname.startsWith('/login') ||
+        request.nextUrl.pathname.startsWith('/signup') ||
+        request.nextUrl.pathname.startsWith('/auth') ||
+        request.nextUrl.pathname.startsWith('/forgot-password') ||
+        request.nextUrl.pathname.startsWith('/reset-password')
+
+    // ── Redirect Unauthenticated Users ────────────────────────────
+    if (!user && !isPublicRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
+
+    // ── Redirect Authenticated Users away from Auth Pages ──────────
+    // If they are logged in and try to go to Login/Signup, send to Dashboard
+    if (user && (
+        request.nextUrl.pathname === '/' ||
+        request.nextUrl.pathname.startsWith('/login') ||
+        request.nextUrl.pathname.startsWith('/signup') ||
+        request.nextUrl.pathname.startsWith('/forgot-password')
+    )) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard'
         return NextResponse.redirect(url)
     }
 
