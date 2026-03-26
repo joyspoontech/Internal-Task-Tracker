@@ -25,14 +25,25 @@ export default function NewTaskModal({
     const formRef = useRef<HTMLFormElement>(null)
 
     async function handleSubmit(formData: FormData) {
+        if (isSubmitting) return
         setIsSubmitting(true)
-        formData.set('priority', selectedPriority)
-        if (isEmployee) {
-            formData.set('is_self_task', 'true')
+        try {
+            formData.set('priority', selectedPriority)
+            if (isEmployee) {
+                formData.set('is_self_task', 'true')
+            }
+            const result = await createTask(formData)
+            if (result.success) {
+                onClose()
+            } else {
+                // If there's an error, allow the user to try again
+                setIsSubmitting(false)
+                alert(result.error || 'Failed to create task')
+            }
+        } catch (error) {
+            console.error('Error in handleSubmit:', error)
+            setIsSubmitting(false)
         }
-        await createTask(formData)
-        setIsSubmitting(false)
-        onClose()
     }
 
     const priorities = [

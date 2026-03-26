@@ -28,6 +28,26 @@ export async function createTask(formData: FormData) {
     const given_by_id = formData.get('given_by_id') as string // Employee self-task: manager who gave the task
     const is_self_task = formData.get('is_self_task') === 'true'
 
+    // ── Duplicate Prevention ──
+    // Check if an identical task was created by this user in the last 10 seconds
+    const tenSecondsAgo = new Date(Date.now() - 10000).toISOString()
+    const { data: existingTask } = await supabase
+        .from('tasks')
+        .select('id')
+        .eq('creator_id', user.id)
+        .eq('org_id', profile.org_id)
+        .eq('title', title)
+        .eq('description', description || '')
+        .eq('assignee_id', is_self_task ? user.id : (assignee_id || user.id))
+        .gt('created_at', tenSecondsAgo)
+        .limit(1)
+        .maybeSingle()
+
+    if (existingTask) {
+        console.log('Duplicate task detected, skipping insertion')
+        return { success: true, message: 'Duplicate detected, skipped insertion' }
+    }
+
     const due_date_iso = due_date ? new Date(due_date).toISOString() : null
     const reminder_schedule = due_date_iso ? calculateReminderSchedule(due_date_iso) : null
 
@@ -122,6 +142,18 @@ export async function updateTaskStatus(taskId: string, newStatus: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
 
+    // Idempotency check: don't notify if the status hasn't actually changed
+    // We get the previous status first
+    const { data: oldTask } = await supabase
+        .from('tasks')
+        .select('status')
+        .eq('id', taskId)
+        .single()
+
+    if (oldTask?.status === newStatus) {
+        return { success: true, message: 'Status unchanged, skipping notification' }
+    }
+
     const { error } = await supabase
         .from('tasks')
         .update({ status: newStatus, updated_at: new Date().toISOString() })
@@ -132,7 +164,8 @@ export async function updateTaskStatus(taskId: string, newStatus: string) {
         return { error: error.message }
     }
 
-    // Fire notifications for Blocked and Completed status changes
+    // Fire notifications for Blocked and Completed status changes 
+    // IF the status actually changed (checked above)
     if (newStatus === 'Blocked' || newStatus === 'Completed') {
         const { data: task } = await supabase
             .from('tasks')
@@ -236,6 +269,22 @@ export async function addComment(taskId: string, body: string) {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
+
+    // ── Duplicate Prevention ──
+    const fiveSecondsAgo = new Date(Date.now() - 5000).toISOString()
+    const { data: existingComment } = await supabase
+        .from('comments')
+        .select('id')
+        .eq('task_id', taskId)
+        .eq('user_id', user.id)
+        .eq('body', body)
+        .gt('created_at', fiveSecondsAgo)
+        .limit(1)
+        .maybeSingle()
+
+    if (existingComment) {
+        return { success: true, message: 'Duplicate comment detected' }
+    }
 
     const { error } = await supabase
         .from('comments')

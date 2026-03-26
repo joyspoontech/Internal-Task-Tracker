@@ -151,16 +151,15 @@ export default async function DashboardPage() {
         
         assignableUsers = [...(leadership || []), ...(employees || [])]
     } else if (role === 'Manager') {
-        // Managers see all leadership + employees in their OWN department
-        const { data: deptEmployees } = await supabase
+        // Managers see all leadership + ALL employees in the org (not just their dept)
+        const { data: allEmployees } = await supabase
             .from('users')
             .select('id, full_name, role, department')
             .eq('org_id', profile.org_id)
             .eq('role', 'Employee')
-            .eq('department', profile.department)
             .order('full_name')
         
-        assignableUsers = [...(leadership || []), ...(deptEmployees || [])]
+        assignableUsers = [...(leadership || []), ...(allEmployees || [])]
     } else {
         // Employees see all leadership + only THEMSELVES (no peer employees)
         assignableUsers = [...(leadership || [])]

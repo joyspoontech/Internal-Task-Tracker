@@ -6,9 +6,9 @@
 - **Architecture**: Role-based access (Founder, Manager, Employee, Admin). Supabase client on browser and server.
 
 ## Current State
-- **Version**: 1.2.0
-- **Status**: Stable / Feature Complete (Phase 11)
-- **Last Updated**: 2026-03-20
+- **Version**: 1.3.0
+- **Status**: Stable / Robust (Phase 15 Completed)
+- **Last Updated**: 2026-03-26
 
 ## File Structure
 ```
@@ -40,4 +40,7 @@
 - **Database Schema**: Managed in Supabase
 
 ## Development Notes
-Follow ui-ux-pro-max guidelines for white/light clean themes with smooth animations.
+### Robustness Policy
+- **Interaction Guards**: Every async UI handler MUST include `if (loadingState) return;` at the top to prevent race conditions.
+- **Server Deduplication**: Creation actions (tasks, comments) MUST include a 5-10s deduplication window based on user/body hash.
+- **UI Consistency**: Follow `ui-ux-pro-max` guidelines for white/light clean themes with smooth animations.

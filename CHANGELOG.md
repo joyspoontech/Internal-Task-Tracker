@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- [NEW] Global interaction guards: Implemented internal state checks in 7 key action components (Department/Team Manager, Profile Form, Task Detail, Task Card, Export Button, Google Login) to prevent race conditions and duplicate actions from rapid clicks.
+- [NEW] Server-side comment deduplication: Added 5-second window to prevent duplicate comment creation.
+- [NEW] Notification idempotency: Status update notifications now only fire if the status has actually changed.
+- [NEW] Duplicate task prevention: Implemented UI guards and server-side checks to prevent redundant task creation.
 - [NEW] Task Acceptance workflow: Assignees must accept/reject new tasks.
 - [NEW] Rejection reason requirement for rejected tasks.
 - [NEW] 'Pending Acceptance' and 'Rejected' statuses with corresponding UI styling.
 
 ### Changed
+- Improved `NewTaskModal` to handle submission states more robustly.
+- Enhanced `createTask` server action with a 10-second deduplication window.
 - Updated `createTask` server action to initialize tasks in 'Pending Acceptance' status.
 - Enhanced `TaskDetailModal` with Accept/Reject controls.
 - Updated `FilterChips` and `TaskCard` to support new task statuses.

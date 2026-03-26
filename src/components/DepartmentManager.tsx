@@ -10,7 +10,7 @@ export default function DepartmentManager({ orgId, initialDepartments }: { orgId
     const [isSaving, setIsSaving] = useState(false)
 
     async function handleAdd() {
-        if (!newDept.trim()) return
+        if (isSaving || !newDept.trim()) return
         if (departments.includes(newDept.trim())) return
         
         const updated = [...departments, newDept.trim()]
@@ -20,6 +20,7 @@ export default function DepartmentManager({ orgId, initialDepartments }: { orgId
     }
 
     async function handleRemove(name: string) {
+        if (isSaving) return
         const updated = departments.filter(d => d !== name)
         setDepartments(updated)
         await save(updated)

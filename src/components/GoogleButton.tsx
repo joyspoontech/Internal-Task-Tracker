@@ -7,6 +7,7 @@ export default function GoogleButton({ text = 'Continue with Google' }: { text?:
     const [isLoading, setIsLoading] = useState(false)
 
     const handleGoogleLogin = async () => {
+        if (isLoading) return
         setIsLoading(true)
         const supabase = createClient()
         await supabase.auth.signInWithOAuth({

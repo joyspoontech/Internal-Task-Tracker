@@ -18,6 +18,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
     const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null)
 
     async function handleSubmit(formData: FormData) {
+        if (isSaving) return
         setIsSaving(true)
         setMessage(null)
         

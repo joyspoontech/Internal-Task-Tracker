@@ -58,7 +58,7 @@ export default function TaskDetailModal({
     }
 
     function handleAddComment() {
-        if (!newComment.trim()) return
+        if (isPending || !newComment.trim()) return
         startTransition(async () => {
             await addComment(task.id, newComment.trim())
             setNewComment('')
@@ -67,12 +67,14 @@ export default function TaskDetailModal({
     }
 
     function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        if (isPending) return
         startTransition(async () => {
             await updateTaskStatus(task.id, e.target.value)
         })
     }
 
     function handleResponse(accept: boolean) {
+        if (isPending) return
         if (!accept && !rejectionReason.trim()) return
         startTransition(async () => {
             await respondToTask(task.id, accept, rejectionReason.trim() || undefined)

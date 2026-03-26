@@ -41,12 +41,14 @@ export default function TaskCard({ task, isAssignee = false }: { task: Task, isA
     }
 
     async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        if (isUpdating) return
         setIsUpdating(true)
         await updateTaskStatus(task.id, e.target.value)
         setIsUpdating(false)
     }
 
     function handleResponse(accept: boolean) {
+        if (isPending) return
         if (!accept && !rejectionReason.trim()) return
         startTransition(async () => {
             await respondToTask(task.id, accept, rejectionReason.trim() || undefined)

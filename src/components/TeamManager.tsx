@@ -19,6 +19,7 @@ export default function TeamManager({ members, departments, currentUserId }: { m
     const [feedback, setFeedback] = useState<{ id: string, message: string, type: 'success' | 'error' } | null>(null)
 
     async function handleUpdate(id: string, updates: Partial<Member>) {
+        if (updatingId === id) return
         setUpdatingId(id)
         setFeedback(null)
         const res = await updateUserProfile(id, updates)
