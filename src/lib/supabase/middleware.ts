@@ -48,12 +48,14 @@ export async function updateSession(request: NextRequest) {
 
     // ── Redirect Authenticated Users away from Auth Pages ──────────
     // If they are logged in and try to go to Login/Signup, send to Dashboard
-    if (user && (
+    // EXCEPT for /signup/complete which is where they should be if their profile is missing.
+    const isAuthPage = 
         request.nextUrl.pathname === '/' ||
         request.nextUrl.pathname.startsWith('/login') ||
-        request.nextUrl.pathname.startsWith('/signup') ||
+        (request.nextUrl.pathname.startsWith('/signup') && request.nextUrl.pathname !== '/signup/complete') ||
         request.nextUrl.pathname.startsWith('/forgot-password')
-    )) {
+
+    if (user && isAuthPage) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)

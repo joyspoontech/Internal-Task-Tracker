@@ -23,6 +23,10 @@ export default async function DashboardLayout({
         .select('full_name, role, department')
         .eq('id', user.id)
         .single()
+    
+    if (!profile) {
+        return redirect('/signup/complete')
+    }
 
     const roleColors: Record<string, string> = {
         'Founder': 'bg-amber-50 text-amber-700',

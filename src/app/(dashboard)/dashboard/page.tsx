@@ -74,7 +74,7 @@ export default async function DashboardPage() {
         .eq('id', user.id)
         .single()
 
-    if (!profile) return redirect('/login')
+    if (!profile) return redirect('/signup/complete')
 
     const role = profile.role
 

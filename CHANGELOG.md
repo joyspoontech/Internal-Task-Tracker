@@ -48,7 +48,9 @@ All notable changes to this project will be documented in this file.
 - **Google OAuth**: Full Login/Signup with Google + auto-onboarding flow.
 - **Analytics Engine**: Role-scoped donut charts with responsive grid layout.
 - **Notification System**: Integrated n8n webhooks for real-time Email and WhatsApp alerts.
-- **Automation**: Cron-based task reminders and overdue triggers.
+- **Version**: 1.3.1
+- **Status**: In Development
+- **Last Updated**: 2026-04-02
 - **Task Interaction**: Real-time dashboard updates, task comments, and detail modals.
 - **Polish**: Finalized glassmorphism UI, entrance animations, and responsive fixes.
 - [Phase 6]: Completely redesigned 'Create New Task' and 'Task Detail' modals with premium aesthetics.
@@ -56,6 +58,9 @@ All notable changes to this project will be documented in this file.
 - Integrated Lucide icons for better visual guidance in task forms.
 
 ### Fixed
+- Fixed an issue where changing a member's role or department via the Settings panel would silently fail to save due to Row Level Security constraints.
+- Resolved `ERR_TOO_MANY_REDIRECTS` loop for authenticated users without profiles (e.g., new Google Auth signups).
+- Standardized internal dashboard redirects to `/signup/complete` instead of `/login`.
 - Fixed "side white blocks" issue when modals are open by explicitly setting backdrop dimensions to full viewport (`w-screen h-screen`) and forcing origin pinning (`left-0 top-0`).
 - Fixed inconsistent backdrop blur by increasing intensity to `backdrop-blur-xl` for a more premium glassmorphism effect.
 
