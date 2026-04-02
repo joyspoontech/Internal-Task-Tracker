@@ -1,15 +1,7 @@
 'use server'
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-
-function getAdminClient() {
-    return createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-}
 
 // ── Update Organization Departments ──────────────────────────
 export async function updateOrgDepartments(orgId: string, departments: string[]) {
@@ -29,8 +21,7 @@ export async function updateOrgDepartments(orgId: string, departments: string[])
         throw new Error('Forbidden')
     }
 
-    const supabaseAdmin = getAdminClient()
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
         .from('organisations')
         .update({ departments })
         .eq('id', orgId)
@@ -68,8 +59,7 @@ export async function updateUserProfile(targetUserId: string, updates: {
         throw new Error('Forbidden')
     }
 
-    const supabaseAdmin = getAdminClient()
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
         .from('users')
         .update(updates)
         .eq('id', targetUserId)

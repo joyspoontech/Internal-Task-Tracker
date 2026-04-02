@@ -60,6 +60,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fixed an issue where changing a member's role or department via the Settings panel would silently fail to save due to Row Level Security constraints.
 - Resolved `ERR_TOO_MANY_REDIRECTS` loop for authenticated users without profiles (e.g., new Google Auth signups).
+- Hardened database security by securing the search path of functions `update_updated_at`, `auto_confirm_user`, and `get_auth_org_id` against privilege escalation (search_path hijacking).
+- Future-proofed `api/cron/reminders/route.ts` by adding a safety check for `SUPABASE_SERVICE_ROLE_KEY`, turning a hard crash into a handled 500 error when the API route fires locally.
 - Standardized internal dashboard redirects to `/signup/complete` instead of `/login`.
 - Fixed "side white blocks" issue when modals are open by explicitly setting backdrop dimensions to full viewport (`w-screen h-screen`) and forcing origin pinning (`left-0 top-0`).
 - Fixed inconsistent backdrop blur by increasing intensity to `backdrop-blur-xl` for a more premium glassmorphism effect.
